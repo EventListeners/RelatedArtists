@@ -5,11 +5,9 @@ import { Rate } from "k6/metrics";
 export let errorRate = new Rate("errors");
 
 export let options = {
-  vus: 300,
+  vus: 200,
+  rps: 2000,
   duration: "300s",
-  thresholds: {
-    errors: ["rate<0.01"]
-  }
 };
 
 export default function() {
@@ -17,5 +15,5 @@ export default function() {
   let res = http.get(`http://localhost:3002/artists/relatedArtists/${num}`);
   check(res, {
     "status was 200": r => r.status == 200 
-  }) || errorRate.add(1);
+  })
 }

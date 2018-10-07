@@ -28,3 +28,4 @@ dist/
 *.csv
 
 newrelic.js
+*.rdb

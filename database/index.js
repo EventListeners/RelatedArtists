@@ -10,9 +10,9 @@ const pool = new Pool({
 
 const getRelatedArtists = function (id, showArtistCB) {
   let sqlQuery =
-    `SELECT * 
+    `SELECT artist_name, listeners, pic_url, song
     FROM artists 
-    WHERE artist_id IN 
+    WHERE artist_id IN
       (SELECT related_id
       FROM related_artists
       WHERE artist_id = ${id})`;

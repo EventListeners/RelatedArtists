@@ -51,6 +51,7 @@
     "pg-copy-streams": "1.2.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "redis": "^2.8.0",
     "regenerator-runtime": "^0.12.1",
     "styled-components": "^3.4.9"
   },
