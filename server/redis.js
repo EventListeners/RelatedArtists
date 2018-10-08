@@ -7,3 +7,5 @@ client.on('connect', () => {
 client.on('error', err => {
   console.log(`ERROR: ${err}`);
 });
+
+module.exports.client = client;
