@@ -1,5 +1,4 @@
 const { Pool } = require('pg');
-const path = require('path');
 
 const pool = new Pool({
   "host": "localhost",
@@ -8,17 +7,32 @@ const pool = new Pool({
   "port": "5432"
 });
 
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err)
+  process.exit(-1)
+})
+
 const getRelatedArtists = function (id, showArtistCB) {
   let sqlQuery =
-    `SELECT artist_name, listeners, pic_url, song
-    FROM artists 
-    WHERE artist_id IN
-      (SELECT related_id
-      FROM related_artists
-      WHERE artist_id = ${id})`;
-  pool.query(sqlQuery)
-    .then(suc => {showArtistCB(null, suc)})
-    .catch(err => {showArtistCB(err)});
+  `SELECT artist_name, listeners, pic_url, song
+  FROM artists 
+  WHERE artist_id IN
+    (SELECT related_id
+    FROM related_artists
+    WHERE artist_id = ${id})`;
+  pool.connect()
+    .then(client => {
+      return client.query(sqlQuery)
+        .then(res => {
+          client.release();
+          showArtistCB(null, res.rows);
+        })
+        .catch(err => {
+          client.release();
+          showArtistCB(err.stack);
+        });
+    })
+
 };
 
 const addNewArtist = (artist, insertArtistCB) => {
@@ -30,15 +44,6 @@ const addNewArtist = (artist, insertArtistCB) => {
     .catch(err => {insertArtistCB(err)})
 };
 
-const updateArtist = (id, update, updateArtistCB) => {
-  let query = 
-    `UPDATE artists 
-    SET (artist_name, listeners, pic_url, song) = (${update.artist_name}, ${update.listeners}, ${update.pic_url}, ${update.song})
-    WHERE artist_id = ${id}`;
-  pool.query(query)
-    .then(suc => {updateArtistCB(null, `Updated the artist with id = ${id}`)})
-    .catch(err => {updateArtistCB(err)});
-};
 
 const deleteArtist = (id, deleteArtistCB) => {
   let query = 

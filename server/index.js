@@ -1,40 +1,46 @@
 require('newrelic');
 const express = require('express');
-const app = express();
 const db = require('../database/index.js');
-const path = require('path');
 const cors = require('cors');
 const cluster = require('cluster');
-const compression = require('compression');
-var http = require('http');  
-var https = require('https');
-http.globalAgent.maxSockets = Infinity;  
-https.globalAgent.maxSockets = Infinity;  
+const redis = require('redis');
+const client = redis.createClient();
+const app = express();
 
 if (cluster.isMaster) {
   const numCPUs = require('os').cpus().length;
-  // console.log(`Master ${process.pid} is running`);
+  console.log(`Master ${process.pid} is running`);
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
   cluster.on('exit', (worker) => {
-    // console.log('mayday! mayday! worker', worker.id, ' is no more!');
+    console.log('mayday! mayday! worker', worker.id, ' is no more!');
     cluster.fork();
   });
 }
 else {
   app.use(cors());
-  app.use(compression());
   // app.use('/artists/:id', express.static(path.join(__dirname + '/../public')));
 
-  app.get(`/artists/relatedArtists/:id`, (req, res) => {
+  const getArtists = (id, res) => {
     db.getRelatedArtists(req.params.id, (err, data) => {
       if (err) {
         res.status(400).send(err);
       } else {
-        res.send(data.rows);
+        client.setex(id, 3600, JSON.stringify(data));
+        res.send(data);
       }
     });
+  }
+
+  app.get(`/artists/relatedArtists/:id`, (req, res) => {
+    client.get(req.params.id, (err, suc) => {
+      if (err) {
+        getArtists(req.params.id, res);
+      } else {
+        res.send(suc);
+      }
+    })
   });
 
   app.post('/artists/relatedArtists', (req, res) => {
@@ -74,6 +80,6 @@ else {
 
   const port = process.env.port || 3002;
   app.listen(port, () => {
-    // console.log(`${cluster.worker.id} is listening on ${port} broski`);
+    console.log(`${cluster.worker.id} is listening on ${port} broski`);
   });
 }
