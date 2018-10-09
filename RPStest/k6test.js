@@ -11,7 +11,7 @@ export let options = {
 };
 
 export default function() {
-  var num = Math.floor(Math.random() * 1000000 + 9000000);
+  var num = Math.floor(Math.random() * 10000 + 9000000);
   let res = http.get(`http://localhost:3002/artists/relatedArtists/${num}`);
   check(res, {
     "status was 200": r => r.status == 200 
