@@ -23,7 +23,7 @@ else {
   // app.use('/artists/:id', express.static(path.join(__dirname + '/../public')));
 
   const getArtists = (id, res) => {
-    db.getRelatedArtists(req.params.id, (err, data) => {
+    db.getRelatedArtists(id, (err, data) => {
       if (err) {
         res.status(400).send(err);
       } else {
@@ -34,11 +34,13 @@ else {
   }
 
   app.get(`/artists/relatedArtists/:id`, (req, res) => {
-    client.get(req.params.id, (err, suc) => {
+    client.get(JSON.stringify(req.params.id), (err, suc) => {
       if (err) {
-        getArtists(req.params.id, res);
-      } else {
+        throw err;
+      } else if (suc != null) {
         res.send(suc);
+      } else {
+        getArtists(req.params.id, res);
       }
     })
   });

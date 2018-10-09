@@ -1,10 +1,11 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  "host": "localhost",
-  "user": "Jeongdizzle",
-  "database": "artists",
-  "port": "5432"
+  host: "localhost",
+  user: "Jeongdizzle",
+  database: "artists",
+  port: "5432",
+  max: 20,
 });
 
 pool.on('error', (err, client) => {
@@ -23,13 +24,12 @@ const getRelatedArtists = function (id, showArtistCB) {
   pool.connect()
     .then(client => {
       return client.query(sqlQuery)
-        .then(res => {
+        .then(data => {
           client.release();
-          showArtistCB(null, res.rows);
+          showArtistCB(null, data);
         })
         .catch(err => {
-          client.release();
-          showArtistCB(err.stack);
+          showArtistCB('ERROR WITH QUERY', null);
         });
     })
 

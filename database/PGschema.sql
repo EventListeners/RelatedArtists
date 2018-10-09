@@ -1,18 +1,16 @@
-DROP DATABASE IF EXISTS artists;
-CREATE DATABASE artists;
 \c artists
 
-DROP TABLE IF EXISTS artists CASCADE;
-CREATE TABLE IF NOT EXISTS artists (
+DROP TABLE IF EXISTS artists;
+CREATE TABLE artists (
   artist_ID SERIAL PRIMARY KEY,
-  artist_name VARCHAR(50),
-  listeners INTEGER,
-  pic_url VARCHAR(400),
-  song VARCHAR(30)
+  artist_name VARCHAR(40) NOT NULL,
+  listeners INTEGER NOT NULL,
+  pic_url VARCHAR(100) NOT NULL,
+  song VARCHAR(20)
 );
 
 DROP TABLE IF EXISTS related_artists;
-CREATE TABLE IF NOT EXISTS related_artists (
-  artist_ID INTEGER,
-  related_ID INTEGER
+CREATE TABLE related_artists (
+  artist_ID INTEGER NOT NULL,
+  related_ID INTEGER NOT NULL
 );

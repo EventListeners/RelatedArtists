@@ -3,10 +3,11 @@ const { Pool } = require('pg');
 const path = require('path');
 
 const pool = new Pool({
-  "host": "localhost",
-  "user": "Jeongdizzle",
-  "database": "artists",
-  "port": "5432"
+  host: "localhost",
+  user: "Jeongdizzle",
+  database: "artists",
+  port: "5432",
+  max: 20,
 });
 
 const copyIntoTable = (tableName, cols, ind) => new Promise((resolve, reject) => {
@@ -34,8 +35,6 @@ const insertPG = async () => {
   await copyManyCSV('related_artists', '(artist_ID,related_ID)');
   console.log('Creating Index for related_artists');
   await pool.query(`CREATE INDEX related_index on related_artists USING HASH (artist_ID)`);
-  console.log('Creating Index for artists');
-  await pool.query('CREATE INDEX artist_index on artists USING HASH (artist_ID)');
   pool.end(() => {console.log('Pool has ended')});
 }
 insertPG();
