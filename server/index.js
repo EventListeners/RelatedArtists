@@ -7,18 +7,18 @@ const cluster = require('cluster');
 // const client = redis.createClient();
 const app = express();
 
-// if (cluster.isMaster) {
-//   const numCPUs = require('os').cpus().length;
-//   console.log(`Master ${process.pid} is running`);
-//   for (let i = 0; i < numCPUs; i++) {
-//     cluster.fork();
-//   }
-//   cluster.on('exit', (worker) => {
-//     console.log('mayday! mayday! worker', worker.id, ' is no more!');
-//     cluster.fork();
-//   });
-// }
-// else {
+if (cluster.isMaster) {
+  const numCPUs = require('os').cpus().length;
+  console.log(`Master ${process.pid} is running`);
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker) => {
+    console.log('mayday! mayday! worker', worker.id, ' is no more!');
+    cluster.fork();
+  });
+}
+else {
   app.use(cors());
   // app.use('/artists/:id', express.static(path.join(__dirname + '/../public')));
   app.get('/artists/relatedArtists/:id', (req, res) => {
@@ -93,7 +93,7 @@ const app = express();
 
   const port = process.env.port || 3002;
   app.listen(port, () => {
-    console.log('listening on port ', port);
-    // console.log(`${cluster.worker.id} is listening on ${port} broski`);
+    // console.log('listening on port ', port);
+    console.log(`${cluster.worker.id} is listening on ${port} broski`);
   });
-// }
+}
