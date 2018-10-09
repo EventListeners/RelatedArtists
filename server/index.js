@@ -22,6 +22,7 @@ const app = express();
   app.use(cors());
   // app.use('/artists/:id', express.static(path.join(__dirname + '/../public')));
   app.get('/artists/relatedArtists/:id', (req, res) => {
+    const id = req.params.id;
     db.getRelatedArtists(id, (err, data) => {
       if (err) {
         res.status(400).send(err);
