@@ -2,47 +2,49 @@ require('newrelic');
 const express = require('express');
 const db = require('./database/index.js');
 const cors = require('cors');
-// const cluster = require('cluster');
-// const redis = require('redis');
-// const client = redis.createClient();
+const cluster = require('cluster');
+const redis = require('redis');
+const client = redis.createClient();
 const app = express();
 
-// if (cluster.isMaster) {
-//   const numCPUs = require('os').cpus().length;
-//   console.log(`Master ${process.pid} is running`);
-//   for (let i = 0; i < numCPUs; i++) {
-//     cluster.fork();
-//   }
-//   cluster.on('exit', (worker) => {
-//     console.log('mayday! mayday! worker', worker.id, ' is no more!');
-//     cluster.fork();
-//   });
-// }
-// else {
+if (cluster.isMaster) {
+  const numCPUs = require('os').cpus().length;
+  console.log(`Master ${process.pid} is running`);
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker) => {
+    console.log('mayday! mayday! worker', worker.id, ' is no more!');
+    cluster.fork();
+  });
+}
+else {
   app.use(cors());
   // app.use('/artists/:id', express.static(path.join(__dirname + '/../public')));
-  app.get('/artists/relatedArtists/:id', (req, res) => {
-    const id = req.params.id;
-    db.getRelatedArtists(id, (err, data) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        res.send(data);
-      }
-    });
-  })
-
-  ////// DB GET WITH REDIS ////////////
-  // const getArtists = (id, res) => {
+  // app.get('/artists/relatedArtists/:id', (req, res) => {
+  //   const id = req.params.id;
   //   db.getRelatedArtists(id, (err, data) => {
   //     if (err) {
   //       res.status(400).send(err);
   //     } else {
-  //       client.setex(id, 3600, JSON.stringify(data));
   //       res.send(data);
   //     }
   //   });
-  // }
+  // })
+
+  ////// DB GET WITH REDIS ////////////
+  const getArtists = (id, res) => {
+    db.getRelatedArtists(id, (err, data) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        if (id < 100000) {
+          client.setex(id, 3600, JSON.stringify(data));
+        }
+        res.send(data);
+      }
+    });
+  }
 
   app.get(`/artists/relatedArtists/:id`, (req, res) => {
     client.get(JSON.stringify(req.params.id), (err, suc) => {
@@ -96,4 +98,4 @@ const app = express();
     console.log('listening on port ', port);
     // console.log(`${cluster.worker.id} is listening on ${port} broski`);
   });
-// }
+}
