@@ -33,13 +33,9 @@ const insertPG = async () => {
   console.log('adding relatedArtists');
   await copyManyCSV('related_artists', '(artist_ID,related_ID)');
   console.log('Creating Index for related_artists');
-  await pool.query(`CREATE INDEX related_index ON related_artists (artist_ID)`);
-  console.log('Clustering related_artists by related_index');
-  await pool.query('CLUSTER related_artists USING related_index');
+  await pool.query(`CREATE INDEX related_index ON related_artists USING HASH (artist_ID)`);
   console.log('Creating Index for artists');
-  await pool.query('CREATE INDEX artist_index ON artists (artist_id)');
-  console.log('Clustering artists by artist_index');
-  await pool.query('CLUSTER artists USING artist_index');
+  await pool.query('CREATE INDEX artist_index ON artists USING HASH (artist_id)');
   pool.end(() => {console.log('Pool has ended')});
 }
 insertPG();

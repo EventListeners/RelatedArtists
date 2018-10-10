@@ -21,6 +21,7 @@ const getRelatedArtists = function (id, showArtistCB) {
     (SELECT related_id
     FROM related_artists
     WHERE artist_id = ${id})`;
+  // `SELECT artist_name, listeners, pic_url, song FROM artist_join WHERE artist_id = ${id}`;
   pool.connect()
     .then(client => {
       return client.query(sqlQuery)
