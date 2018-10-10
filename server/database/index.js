@@ -1,12 +1,7 @@
 const { Pool } = require('pg');
+const poolSettings = require('./pgConnSettings.js');
 
-const pool = new Pool({
-  host: "localhost",
-  user: "Jeongdizzle",
-  database: "artists",
-  port: "5432",
-  max: 20,
-});
+const pool = new Pool(poolSettings);
 
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err)
@@ -29,7 +24,7 @@ const getRelatedArtists = function (id, showArtistCB) {
           showArtistCB(null, data.rows);
         })
         .catch(err => {
-          showArtistCB('ERROR WITH QUERY', null);
+          showArtistCB(err, null);
         });
     })
 
