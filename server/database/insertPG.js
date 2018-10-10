@@ -3,7 +3,8 @@ const path = require('path');
 
 const pool = new Pool({
   host: "localhost",
-  user: "Jeongdizzle",
+  user: "postgres",
+  password: "password",
   database: "artists",
   port: "5432",
   max: 20,
@@ -22,16 +23,16 @@ const copyIntoTable = (tableName, cols, ind) => new Promise((resolve, reject) =>
 });
 
 const copyManyCSV = async (tableName, colName) => {
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 7; i <= 10; i++) {
     await copyIntoTable(tableName, colName, i);
   }
 };
 
 const insertPG = async () => {
-  console.log('adding artists');
-  await copyManyCSV('artists', '(artist_name,listeners,pic_url,song)')
-  console.log('adding relatedArtists');
-  await copyManyCSV('related_artists', '(artist_ID,related_ID)');
+  // console.log('adding artists');
+  // await copyManyCSV('artists', '(artist_name,listeners,pic_url,song)')
+  // console.log('adding relatedArtists');
+  // await copyManyCSV('related_artists', '(artist_ID,related_ID)');
   console.log('Creating Index for related_artists');
   await pool.query(`CREATE INDEX related_index ON related_artists USING HASH (artist_ID)`);
   console.log('Creating Index for artists');
