@@ -15,20 +15,26 @@
 
 ## Usage
 
-> The server & database for this project has been configured to serve JSON data for the frontend Webpack bundle files, which have not been provided. Populate the database and run npm start to start this service on localhost:3002.
-> The endpoint of '/artists/relatedArtists/:id' with 'id' being a specific artist's id will retrieve the related artists for that artist.
+The server & database for this project has been configured to serve JSON data for the frontend Webpack bundle files, which have not been provided. Populate the database and run npm start to start this service on localhost:3002.
+
+The endpoint of '/artists/relatedArtists/:id' with 'id' being a specific artist's id will retrieve the related artists for that artist.
 
 ## Requirements
-> Node v 10.14.0 was used for this project. Any node version with async, await functionality will work as well.
+Node v 10.14.0 was used for this project. Any node version with async, await functionality will work as well.
   
 ## Development
 
 ### Installing Dependencies
 
-From within the root directory:
-
+From within the root directory to setup and start the service:
 ```sh
-npm install -g webpack
-npm install
+npm i
+npm start
 ```
+In order to populate the database, you must run the following scripts within the server/database directory:
+```sh
+node aristGen.js
+node insertPG.js
+```
+
 
